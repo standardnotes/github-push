@@ -46,8 +46,12 @@ angular.module('app', []);class HomeCtrl {
 
       me.listRepos(function (err, repos) {
         $timeout(function () {
-          $scope.repos = repos;
           $scope.formData.loadingRepos = false;
+          if (err) {
+            alert("An error occurred with the GitHub Push extension. Make sure your GitHub token is valid and try again.");
+            return;
+          }
+          $scope.repos = repos;
           $scope.loadRepoDataForCurrentNote();
         });
       });
