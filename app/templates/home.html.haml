@@ -1,0 +1,18 @@
+.center-container.body-text-color{"ng-if" => "!formData.loading"}
+  .meta
+    .title GitHub Push
+    %a.logout{"ng-if" => "token", "ng-click" => "logout()"} Logout
+
+  .section.token-form{"ng-if" => "!token"}
+    %input{"ng-model" => "formData.token", "placeholder" => "Enter GitHub token", "ng-keyup" => "$event.keyCode == 13 && submitToken();"}
+  .section{"ng-if" => "!token"}
+    %a{"href" => "https://github.com/settings/tokens/new", "target" => "_blank"} Generate Token
+  .section{"ng-if" => "token"}
+    .title {{formData.loadingRepos ? 'Loading Repositories' : 'Repository'}}
+    %select{"ng-if" => "!formData.loadingRepos", "ng-model" => "formData.selectedRepo", "ng-change" => "didSelectRepo()"}
+      %option{"ng-repeat" => "repo in repos", "ng-selected" => "repo == formData.selectedRepo", "ng-value" => "repo"} {{repo.name}}
+
+  .buttons{"ng-if" => "formData.selectedRepo"}
+    %input.file-ext{"placeholder" => "File extension", "ng-model" => "formData.fileExtension"}
+    %input.commit-message{"placeholder" => "Commit message (optional)", "ng-model" => "formData.commitMessage", "ng-keyup" => "$event.keyCode == 13 && pushChanges($event);"}
+    %button.element-background-color.element-text-color{"ng-click" => "pushChanges($event)"} {{formData.pushStatus}}

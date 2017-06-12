@@ -1,0 +1,23 @@
+<div class='center-container body-text-color' ng-if='!formData.loading'>
+<div class='meta'>
+<div class='title'>GitHub Push</div>
+<a class='logout' ng-click='logout()' ng-if='token'>Logout</a>
+</div>
+<div class='section token-form' ng-if='!token'>
+<input ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token'>
+</div>
+<div class='section' ng-if='!token'>
+<a href='https://github.com/settings/tokens/new' target='_blank'>Generate Token</a>
+</div>
+<div class='section' ng-if='token'>
+<div class='title'>{{formData.loadingRepos ? 'Loading Repositories' : 'Repository'}}</div>
+<select ng-change='didSelectRepo()' ng-if='!formData.loadingRepos' ng-model='formData.selectedRepo'>
+<option ng-repeat='repo in repos' ng-selected='repo == formData.selectedRepo' ng-value='repo'>{{repo.name}}</option>
+</select>
+</div>
+<div class='buttons' ng-if='formData.selectedRepo'>
+<input class='file-ext' ng-model='formData.fileExtension' placeholder='File extension'>
+<input class='commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>
+<button class='element-background-color element-text-color' ng-click='pushChanges($event)'>{{formData.pushStatus}}</button>
+</div>
+</div>
