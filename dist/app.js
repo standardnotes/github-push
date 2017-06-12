@@ -6,7 +6,11 @@ angular.module('app', []);class HomeCtrl {
 
     $scope.formData = { loading: true, pushStatus: "Push Changes" };
 
-    let componentManager = new window.ComponentManager(true, function () {
+    var permissions = [{
+      name: "stream-context-item"
+    }];
+
+    let componentManager = new window.ComponentManager(permissions, function () {
       $scope.formData.loading = false;
       $scope.onReady();
     });
