@@ -1,6 +1,6 @@
 .center-container.body-text-color{"ng-if" => "!formData.loading"}
   .meta
-    .title GitHub Push {{note.content.title}}
+    .title GitHub Push
     %a.logout{"ng-if" => "token", "ng-click" => "logout()"} Logout
 
   .section.token-form{"ng-if" => "!token"}

@@ -35,7 +35,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   $templateCache.put('home.html',
     "<div class='center-container body-text-color' ng-if='!formData.loading'>\n" +
     "<div class='meta'>\n" +
-    "<div class='title'>GitHub Push {{note.content.title}}</div>\n" +
+    "<div class='title'>GitHub Push</div>\n" +
     "<a class='logout' ng-click='logout()' ng-if='token'>Logout</a>\n" +
     "</div>\n" +
     "<div class='section token-form' ng-if='!token'>\n" +
