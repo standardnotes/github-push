@@ -1,12 +1,11 @@
 {
-  "name": "TagsAutocomplete",
+  "name": "sn-github-push",
   "description": "",
   "main": "",
   "license": "MIT",
-  "homepage": "https://github.com/sn-extensions/folders-component",
+  "homepage": "https://github.com/sn-extensions/github-push",
   "ignore": [
     "**/.*",
-    "node_modules",
     "bower_components",
     "test",
     "tests"

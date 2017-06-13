@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/adapters/fetch-node.js"],"names":["module","exports","require"],"mappings":";;AAAAA,OAAOC,OAAP,GAAiBC,QAAQ,YAAR,CAAjB","file":"fetch-node.js","sourcesContent":["module.exports = require('node-fetch')\n"]}
