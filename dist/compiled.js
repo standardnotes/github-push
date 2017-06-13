@@ -33659,7 +33659,9 @@ angular.module('app', []);class HomeCtrl {
             return;
           }
           $scope.repos = repos;
-          $scope.loadRepoDataForCurrentNote();
+          if ($scope.note) {
+            $scope.loadRepoDataForCurrentNote();
+          }
         });
       });
     };
@@ -33719,14 +33721,12 @@ angular.module('app', []);class HomeCtrl {
       var fileExtension = $scope.formData.fileExtension;
       if (!$scope.defaultFileExtension) {
         // set this as default
-        console.log("Setting as default file ext", fileExtension);
         componentManager.setComponentDataValueForKey("defaultFileExtension", fileExtension);
         $scope.defaultFileExtension = fileExtension;
       }
 
       if (fileExtension !== $scope.noteFileExtension) {
         // set this ext for this note
-        console.log("Setting as note file ext", fileExtension);
         $scope.setDataForNote("fileExtension", fileExtension);
         $scope.noteFileExtension = fileExtension;
       }
@@ -33744,7 +33744,6 @@ angular.module('app', []);class HomeCtrl {
             alert("Something went wrong trying to push your changes.", +err);
           }
         });
-        console.log("Write file", err, result);
       });
     };
 
@@ -33805,7 +33804,7 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
   $templateCache.put('home.html',
     "<div class='center-container body-text-color' ng-if='!formData.loading'>\n" +
     "<div class='meta'>\n" +
-    "<div class='title'>GitHub Push</div>\n" +
+    "<div class='title'>GitHub Push {{note.content.title}}</div>\n" +
     "<a class='logout' ng-click='logout()' ng-if='token'>Logout</a>\n" +
     "</div>\n" +
     "<div class='section token-form' ng-if='!token'>\n" +
@@ -33821,8 +33820,8 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
     "</select>\n" +
     "</div>\n" +
     "<div class='buttons' ng-if='formData.selectedRepo'>\n" +
-    "<input class='file-ext' ng-model='formData.fileExtension' placeholder='File extension'>\n" +
-    "<input class='commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>\n" +
+    "<input class='file-ext body-text-color' ng-model='formData.fileExtension' placeholder='File extension'>\n" +
+    "<input class='commit-message body-text-color' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>\n" +
     "<button class='element-background-color element-text-color' ng-click='pushChanges($event)'>{{formData.pushStatus}}</button>\n" +
     "</div>\n" +
     "</div>\n"

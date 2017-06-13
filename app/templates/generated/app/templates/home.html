@@ -1,6 +1,6 @@
 <div class='center-container body-text-color' ng-if='!formData.loading'>
 <div class='meta'>
-<div class='title'>GitHub Push</div>
+<div class='title'>GitHub Push {{note.content.title}}</div>
 <a class='logout' ng-click='logout()' ng-if='token'>Logout</a>
 </div>
 <div class='section token-form' ng-if='!token'>
@@ -16,8 +16,8 @@
 </select>
 </div>
 <div class='buttons' ng-if='formData.selectedRepo'>
-<input class='file-ext' ng-model='formData.fileExtension' placeholder='File extension'>
-<input class='commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>
+<input class='file-ext body-text-color' ng-model='formData.fileExtension' placeholder='File extension'>
+<input class='commit-message body-text-color' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>
 <button class='element-background-color element-text-color' ng-click='pushChanges($event)'>{{formData.pushStatus}}</button>
 </div>
 </div>

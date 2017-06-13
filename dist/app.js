@@ -56,7 +56,9 @@ angular.module('app', []);class HomeCtrl {
             return;
           }
           $scope.repos = repos;
-          $scope.loadRepoDataForCurrentNote();
+          if ($scope.note) {
+            $scope.loadRepoDataForCurrentNote();
+          }
         });
       });
     };
@@ -116,14 +118,12 @@ angular.module('app', []);class HomeCtrl {
       var fileExtension = $scope.formData.fileExtension;
       if (!$scope.defaultFileExtension) {
         // set this as default
-        console.log("Setting as default file ext", fileExtension);
         componentManager.setComponentDataValueForKey("defaultFileExtension", fileExtension);
         $scope.defaultFileExtension = fileExtension;
       }
 
       if (fileExtension !== $scope.noteFileExtension) {
         // set this ext for this note
-        console.log("Setting as note file ext", fileExtension);
         $scope.setDataForNote("fileExtension", fileExtension);
         $scope.noteFileExtension = fileExtension;
       }
@@ -141,7 +141,6 @@ angular.module('app', []);class HomeCtrl {
             alert("Something went wrong trying to push your changes.", +err);
           }
         });
-        console.log("Write file", err, result);
       });
     };
 
