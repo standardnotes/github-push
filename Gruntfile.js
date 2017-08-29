@@ -57,15 +57,13 @@ module.exports = function(grunt) {
         separator: ';',
       },
       app: {
-        src: ['app/js/**/*.js'],
+        src: ['bower_components/components-api/dist/dist.js', 'app/js/**/*.js'],
         dest: 'dist/app.js',
       },
 
       lib: {
         src: [
           'node_modules/angular/angular.js',
-          'bower_components/components-api/dist/dist.js',
-          // 'node_modules/github-api/dist/GitHub.js'
         ],
         dest: 'dist/lib.js',
       },
@@ -121,6 +119,13 @@ module.exports = function(grunt) {
       }
     },
 
+    uglify: {
+      compiled: {
+        src: ['dist/compiled.js'],
+        dest: 'dist/compiled.min.js'
+      }
+   }
+
   });
 
   grunt.loadNpmTasks('grunt-newer');
@@ -136,6 +141,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
 
   grunt.registerTask('default', [
-    'haml', 'sass', 'ngtemplates', 'concat:app', 'babel', 'browserify',  'concat:lib', 'concat:dist', 'ngAnnotate'
+    'haml', 'sass', 'ngtemplates', 'concat:app', 'babel', 'browserify',
+    'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'
   ]);
 };
