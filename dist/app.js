@@ -399,6 +399,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     if (savedNote) {
       // per note preference
       $scope.noteFileExtension = savedNote.fileExtension;
+      $scope.noteFileDirectory = savedNote.fileDirectory;
       $scope.selectRepoWithName(savedNote.repoName);
     } else {
       // default pref
@@ -411,6 +412,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
     $scope.defaultFileExtension = componentManager.componentDataValueForKey("defaultFileExtension");
     $scope.formData.fileExtension = $scope.noteFileExtension || $scope.defaultFileExtension || "txt";
+
+    $scope.defaultFileDirectory = componentManager.componentDataValueForKey("defaultFileDirectory");
+    $scope.formData.fileDirectory = $scope.noteFileDirectory || $scope.defaultFileDirectory || "";
   };
 
   $scope.selectRepoWithName = function (name) {
@@ -441,11 +445,31 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     componentManager.setComponentDataValueForKey("notes", notesData);
   };
 
+  $scope.sanitizeFileDirectory = function ($directory) {
+    // if no directory is given, then push to root.
+    if (!$directory) return '';
+
+    // try to ensure they haven't attempted any funny business with escape strings by turning
+    // any backslashes into forward slashes - then replace any duplicate slashes with a single
+    // slash.
+    return $directory = $directory
+    // make sure the last symbol is a '/'
+    .replace(/[/]*$/g, '/')
+    // make sure there are no escaping slashes.
+    .replace(/\\/g, '/')
+    // make sure there are no double '//'.
+    .replace(/\/\//g, '/')
+    // make sure the directory does not start with
+    // a '/'.
+    .replace(/^\/+/g, '');
+  };
+
   $scope.pushChanges = function ($event) {
     $event.target.blur();
     var message = $scope.formData.commitMessage || "Updated note '" + $scope.note.content.title + "'";
 
     var fileExtension = $scope.formData.fileExtension;
+    var fileDirectory = $scope.formData.fileDirectory;
     if (!$scope.defaultFileExtension) {
       // set this as default
       componentManager.setComponentDataValueForKey("defaultFileExtension", fileExtension);
@@ -458,8 +482,20 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
       $scope.noteFileExtension = fileExtension;
     }
 
+    if (!$scope.defaultFileDirectory) {
+      // set this as default
+      componentManager.setComponentDataValueForKey("defaultFileDirectory", fileDirectory);
+      $scope.defaultFileDirectory = fileDirectory;
+    }
+
+    if (fileDirectory !== $scope.noteFileDirectory) {
+      // set this directory for the note
+      $scope.setDataForNote("fileDirectory", fileDirectory);
+      $scope.noteFileDirectory = fileDirectory;
+    }
+
     $scope.formData.pushStatus = "Pushing...";
-    $scope.selectedRepoObject.writeFile("master", $scope.note.content.title + "." + fileExtension, $scope.note.content.text, message, { encode: true }, function (err, result) {
+    $scope.selectedRepoObject.writeFile("master", $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension, $scope.note.content.text, message, { encode: true }, function (err, result) {
       $timeout(function () {
         if (!err) {
           $scope.formData.commitMessage = "";
@@ -477,7 +513,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   $scope.logout = function () {
     componentManager.clearComponentData();
     $scope.defaultFileExtension = null;
+    $scope.defaultFileDirectory = null;
     $scope.noteFileExtension = null;
+    $scope.noteFileDirectory = null;
     $scope.selectedRepo = null;
     $scope.repos = null;
     $scope.token = null;

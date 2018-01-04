@@ -1,17 +1,18 @@
 {
-  "name": "sn-github-push",
-  "description": "",
-  "main": "",
-  "license": "MIT",
-  "homepage": "https://github.com/sn-extensions/github-push",
-  "ignore": [
-    "**/.*",
-    "bower_components",
-    "node_modules",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "components-api": "sn-components-api#^0.1.1"
+    "name": "sn-github-push",
+    "description": "",
+    "main": "",
+    "license": "MIT",
+    "homepage": "https://github.com/sn-extensions/github-push",
+    "ignore": [
+      "**/.*",
+      "bower_components",
+      "node_modules",
+      "test",
+      "tests"
+    ],
+    "dependencies": {
+      "components-api": "sn-components-api#^0.1.1"
+    }
   }
-}
+  
