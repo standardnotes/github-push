@@ -13,6 +13,7 @@
       %option{"ng-repeat" => "repo in repos", "ng-selected" => "repo == formData.selectedRepo", "ng-value" => "repo"} {{repo.name}}
 
   .buttons{"ng-if" => "formData.selectedRepo"}
+    %input.file-path.body-text-color{"placeholder" => "Directory", "ng-model" => "formData.fileDirectory"}
     %input.file-ext.body-text-color{"placeholder" => "File extension", "ng-model" => "formData.fileExtension"}
     %input.commit-message.body-text-color{"placeholder" => "Commit message (optional)", "ng-model" => "formData.commitMessage", "ng-keyup" => "$event.keyCode == 13 && pushChanges($event);"}
     %button.element-background-color.element-text-color{"ng-click" => "pushChanges($event)"} {{formData.pushStatus}}
