@@ -51,6 +51,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "</select>\n" +
     "</div>\n" +
     "<div class='buttons' ng-if='formData.selectedRepo'>\n" +
+    "<input class='file-path body-text-color' ng-model='formData.fileDirectory' placeholder='Directory'>\n" +
     "<input class='file-ext body-text-color' ng-model='formData.fileExtension' placeholder='File extension'>\n" +
     "<input class='commit-message body-text-color' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>\n" +
     "<button class='element-background-color element-text-color' ng-click='pushChanges($event)'>{{formData.pushStatus}}</button>\n" +
