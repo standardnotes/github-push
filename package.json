@@ -17,9 +17,8 @@
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-uglify": "^2.0.0",
-    "grunt-ng-annotate": "^3.0.0"
-  },
-  "dependencies": {
-    "github-api": "^3.0.0"
+    "grunt-ng-annotate": "^3.0.0",
+    "github-api": "^3.0.0",
+    "sn-components-api": "^1.0.242"
   }
 }
