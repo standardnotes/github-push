@@ -14,7 +14,7 @@ class HomeCtrl {
       $scope.onReady();
     });
 
-    let defaultHeight = 50;
+    let defaultHeight = 60;
 
     componentManager.streamContextItem(function(item){
       $timeout(function(){
@@ -81,7 +81,7 @@ class HomeCtrl {
 
       $scope.defaultFileExtension = componentManager.componentDataValueForKey("defaultFileExtension");
       $scope.formData.fileExtension = $scope.noteFileExtension || $scope.defaultFileExtension || "txt";
-      
+
       $scope.defaultFileDirectory = componentManager.componentDataValueForKey("defaultFileDirectory");
       $scope.formData.fileDirectory = $scope.noteFileDirectory || $scope.defaultFileDirectory || "";
     }
@@ -119,7 +119,7 @@ class HomeCtrl {
       // if no directory is given, then push to root.
       if (!$directory)
         return '';
-      
+
       // try to ensure they haven't attempted any funny business with escape strings by turning
       // any backslashes into forward slashes - then replace any duplicate slashes with a single
       // slash.

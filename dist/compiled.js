@@ -33909,6 +33909,8 @@ function _classCallCheck(instance, Constructor) {
 
 var ComponentManager = function () {
   function ComponentManager(permissions, onReady) {
+    var _this = this;
+
     _classCallCheck(this, ComponentManager);
 
     this.sentMessages = [];
@@ -33921,12 +33923,32 @@ var ComponentManager = function () {
     this.coallesedSaving = true;
     this.coallesedSavingDelay = 250;
 
-    window.addEventListener("message", function (event) {
-      if (this.loggingEnabled) {
-        console.log("Components API Message received:", event.data);
+    var messageHandler = function messageHandler(event, mobileSource) {
+      if (_this.loggingEnabled) {
+        console.log("Components API Message received:", event.data, "mobile?", mobileSource);
       }
-      this.handleMessage(event.data);
-    }.bind(this), false);
+
+      // The first message will be the most reliable one, so we won't change it after any subsequent events,
+      // in case you receive an event from another window.
+      if (!_this.origin) {
+        _this.origin = event.origin;
+      }
+      _this.mobileSource = mobileSource;
+      // If from mobile app, JSON needs to be used.
+      var data = mobileSource ? JSON.parse(event.data) : event.data;
+      _this.handleMessage(data);
+    };
+
+    // Mobile (React Native) uses `document`, web/desktop uses `window`.addEventListener
+    // for postMessage API to work properly.
+
+    document.addEventListener("message", function (event) {
+      messageHandler(event, true);
+    }, false);
+
+    window.addEventListener("message", function (event) {
+      messageHandler(event, false);
+    }, false);
   }
 
   _createClass(ComponentManager, [{
@@ -33949,6 +33971,11 @@ var ComponentManager = function () {
         var originalMessage = this.sentMessages.filter(function (message) {
           return message.messageId === payload.original.messageId;
         })[0];
+
+        if (!originalMessage) {
+          // Connection must have been reset. Alert the user.
+          alert("This extension is attempting to communicate with Standard Notes, but an error is preventing it from doing so. Please restart this extension and try again.");
+        }
 
         if (originalMessage.callback) {
           originalMessage.callback(payload.data);
@@ -33989,6 +34016,7 @@ var ComponentManager = function () {
 
       this.messageQueue = [];
       this.environment = data.environment;
+      this.platform = data.platform;
       this.uuid = data.uuid;
 
       if (this.onReadyCallback) {
@@ -34046,11 +34074,16 @@ var ComponentManager = function () {
       sentMessage.callback = callback;
       this.sentMessages.push(sentMessage);
 
+      // Mobile (React Native) requires a string for the postMessage API.
+      if (this.mobileSource) {
+        message = JSON.stringify(message);
+      }
+
       if (this.loggingEnabled) {
         console.log("Posting message:", message);
       }
 
-      window.parent.postMessage(message, '*');
+      window.parent.postMessage(message, this.origin);
     }
   }, {
     key: "setSize",
@@ -34105,8 +34138,27 @@ var ComponentManager = function () {
     value: function createItem(item, callback) {
       this.postMessage("create-item", { item: this.jsonObjectForItem(item) }, function (data) {
         var item = data.item;
+
+        // A previous version of the SN app had an issue where the item in the reply to create-item
+        // would be nested inside "items" and not "item". So handle both cases here.
+        if (!item && data.items && data.items.length > 0) {
+          item = data.items[0];
+        }
+
         this.associateItem(item);
         callback && callback(item);
+      }.bind(this));
+    }
+  }, {
+    key: "createItems",
+    value: function createItems(items, callback) {
+      var _this2 = this;
+
+      var mapped = items.map(function (item) {
+        return _this2.jsonObjectForItem(item);
+      });
+      this.postMessage("create-items", { items: mapped }, function (data) {
+        callback && callback(data.items);
       }.bind(this));
     }
   }, {
@@ -34126,18 +34178,21 @@ var ComponentManager = function () {
     }
   }, {
     key: "deleteItem",
-    value: function deleteItem(item) {
-      this.deleteItems([item]);
+    value: function deleteItem(item, callback) {
+      this.deleteItems([item], callback);
     }
   }, {
     key: "deleteItems",
-    value: function deleteItems(items) {
+    value: function deleteItems(items, callback) {
       var params = {
         items: items.map(function (item) {
           return this.jsonObjectForItem(item);
         }.bind(this))
       };
-      this.postMessage("delete-items", params);
+
+      this.postMessage("delete-items", params, function (data) {
+        callback && callback(data);
+      });
     }
   }, {
     key: "sendCustomEvent",
@@ -34149,34 +34204,64 @@ var ComponentManager = function () {
   }, {
     key: "saveItem",
     value: function saveItem(item, callback) {
-      this.saveItems([item], callback);
+      var skipDebouncer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      this.saveItems([item], callback, skipDebouncer);
     }
+
+    /* Presave allows clients to perform any actions last second before the save actually occurs (like setting previews).
+       Saves debounce by default, so if a client needs to compute a property on an item before saving, it's best to
+       hook into the debounce cycle so that clients don't have to implement their own debouncing.
+     */
+
+  }, {
+    key: "saveItemWithPresave",
+    value: function saveItemWithPresave(item, presave, callback) {
+      this.saveItemsWithPresave([item], presave, callback);
+    }
+  }, {
+    key: "saveItemsWithPresave",
+    value: function saveItemsWithPresave(items, presave, callback) {
+      this.saveItems(items, callback, false, presave);
+    }
+
+    /*
+    skipDebouncer allows saves to go through right away rather than waiting for timeout.
+    This should be used when saving items via other means besides keystrokes.
+     */
+
   }, {
     key: "saveItems",
     value: function saveItems(items, callback) {
-      var _this = this;
+      var _this3 = this;
 
-      items = items.map(function (item) {
-        item.updated_at = new Date();
-        return this.jsonObjectForItem(item);
-      }.bind(this));
+      var skipDebouncer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var presave = arguments[3];
 
       var saveBlock = function saveBlock() {
-        _this.postMessage("save-items", { items: items }, function (data) {
+        // presave block allows client to gain the benefit of performing something in the debounce cycle.
+        presave && presave();
+
+        var mappedItems = items.map(function (item) {
+          item.updated_at = new Date();
+          return this.jsonObjectForItem(item);
+        }.bind(_this3));
+
+        _this3.postMessage("save-items", { items: mappedItems }, function (data) {
           callback && callback();
         });
       };
 
       /*
-          Coallesed saving prevents saves from being made after every keystroke, and instead
-          waits coallesedSavingDelay before performing action. For example, if a user types a keystroke, and the clienet calls saveItem,
-          a 250ms delay will begin. If they type another keystroke within 250ms, the previously pending
-          save will be cancelled, and another 250ms delay occurs. If ater 250ms the pending delay is not cleared by a future call,
-          the save will finally trigger.
-           Note: it's important to modify saving items updated_at immediately and not after delay. If you modify after delay,
-          a delayed sync could just be wrapping up, and will send back old data and replace what the user has typed.
+        Coallesed saving prevents saves from being made after every keystroke, and instead
+        waits coallesedSavingDelay before performing action. For example, if a user types a keystroke, and the clienet calls saveItem,
+        a 250ms delay will begin. If they type another keystroke within 250ms, the previously pending
+        save will be cancelled, and another 250ms delay occurs. If ater 250ms the pending delay is not cleared by a future call,
+        the save will finally trigger.
+         Note: it's important to modify saving items updated_at immediately and not after delay. If you modify after delay,
+        a delayed sync could just be wrapping up, and will send back old data and replace what the user has typed.
       */
-      if (this.coallesedSaving == true) {
+      if (this.coallesedSaving == true && !skipDebouncer) {
         if (this.pendingSave) {
           clearTimeout(this.pendingSave);
         }
@@ -34184,6 +34269,8 @@ var ComponentManager = function () {
         this.pendingSave = setTimeout(function () {
           saveBlock();
         }, this.coallesedSavingDelay);
+      } else {
+        saveBlock();
       }
     }
   }, {
@@ -34193,6 +34280,17 @@ var ComponentManager = function () {
       copy.children = null;
       copy.parent = null;
       return copy;
+    }
+  }, {
+    key: "getItemAppDataValue",
+    value: function getItemAppDataValue(item, key) {
+      var AppDomain = "org.standardnotes.sn";
+      var data = item.content.appData && item.content.appData[AppDomain];
+      if (data) {
+        return data[key];
+      } else {
+        return null;
+      }
     }
 
     /* Themes */
@@ -34248,14 +34346,36 @@ var ComponentManager = function () {
   }, {
     key: "deactivateAllCustomThemes",
     value: function deactivateAllCustomThemes() {
-      var elements = document.getElementsByClassName("custom-theme");
+      // make copy, as it will be modified during loop
+      // `getElementsByClassName` is an HTMLCollection, not an Array
+      var elements = Array.from(document.getElementsByClassName("custom-theme")).slice();
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
-      [].forEach.call(elements, function (element) {
-        if (element) {
-          element.disabled = true;
-          element.parentNode.removeChild(element);
+      try {
+        for (var _iterator3 = elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var element = _step3.value;
+
+          if (element) {
+            element.disabled = true;
+            element.parentNode.removeChild(element);
+          }
         }
-      });
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
     }
 
     /* Utilities */
@@ -34317,7 +34437,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.onReady();
   });
 
-  var defaultHeight = 50;
+  var defaultHeight = 60;
 
   componentManager.streamContextItem(function (item) {
     $timeout(function () {
@@ -34541,28 +34661,53 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
 
 
   $templateCache.put('home.html',
-    "<div class='center-container body-text-color' ng-if='!formData.loading'>\n" +
-    "<div class='meta'>\n" +
-    "<div class='title'>GitHub Push</div>\n" +
-    "<a class='logout' ng-click='logout()' ng-if='token'>Logout</a>\n" +
+    "<div class='sn-component'>\n" +
+    "<div class='sk-panel static full-height'>\n" +
+    "<div class='sk-panel-content full-height' id='panel-content' ng-if='!formData.loading'>\n" +
+    "<div class='sk-panel-section no-bottom-pad full-height'>\n" +
+    "<div class='sk-panel-row full-height justify-left'>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div id='title-container'>\n" +
+    "<div id='title'>GitHub Push</div>\n" +
     "</div>\n" +
-    "<div class='section token-form' ng-if='!token'>\n" +
-    "<input ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token'>\n" +
     "</div>\n" +
-    "<div class='section' ng-if='!token'>\n" +
-    "<a href='https://github.com/settings/tokens/new' target='_blank'>Generate Token</a>\n" +
+    "<div class='vertical-rule'></div>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div class='token-form' ng-if='!token'>\n" +
+    "<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token'>\n" +
     "</div>\n" +
-    "<div class='section' ng-if='token'>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-column' id='generate-token-column' ng-if='!token'>\n" +
+    "<a class='sk-a sk-button no-border info' href='https://github.com/settings/tokens/new' target='_blank'>\n" +
+    "<div class='sk-label'>Generate Token</div>\n" +
+    "</a>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-column' ng-if='token'>\n" +
     "<div class='title'>{{formData.loadingRepos ? 'Loading Repositories' : 'Repository'}}</div>\n" +
-    "<select ng-change='didSelectRepo()' ng-if='!formData.loadingRepos' ng-model='formData.selectedRepo'>\n" +
-    "<option ng-repeat='repo in repos' ng-selected='repo == formData.selectedRepo' ng-value='repo'>{{repo.name}}</option>\n" +
+    "<select class='sk-input' ng-change='didSelectRepo()' ng-if='!formData.loadingRepos' ng-model='formData.selectedRepo'>\n" +
+    "<option ng-repeat='repo in repos' ng-selected='repo == formData.selectedRepo' ng-value='repo'>\n" +
+    "{{repo.name}}\n" +
+    "</option>\n" +
     "</select>\n" +
     "</div>\n" +
-    "<div class='buttons' ng-if='formData.selectedRepo'>\n" +
-    "<input class='file-path body-text-color' ng-model='formData.fileDirectory' placeholder='Directory'>\n" +
-    "<input class='file-ext body-text-color' ng-model='formData.fileExtension' placeholder='File extension'>\n" +
-    "<input class='commit-message body-text-color' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message (optional)'>\n" +
-    "<button class='element-background-color element-text-color' ng-click='pushChanges($event)'>{{formData.pushStatus}}</button>\n" +
+    "<div class='vertical-rule'></div>\n" +
+    "<div id='commit-info' ng-if='formData.selectedRepo'>\n" +
+    "<input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Dir'>\n" +
+    "<input class='sk-input contrast file-ext' ng-model='formData.fileExtension' placeholder='Ext'>\n" +
+    "<input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Msg'>\n" +
+    "<div class='sk-button info no-border' ng-click='pushChanges($event)' style='margin-left: 15px;'>\n" +
+    "<div class='sk-label'>{{formData.pushStatus}}</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='vertical-rule' ng-if='formData.selectedRepo'></div>\n" +
+    "<div class='sk-panel-column' ng-if='token'>\n" +
+    "<div class='sk-button danger no-border' ng-click='logout()'>\n" +
+    "<div class='sk-label'>Logout</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
     "</div>\n" +
     "</div>\n"
   );
