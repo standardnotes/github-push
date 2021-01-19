@@ -1,12 +1,11 @@
 module.exports = function(grunt) {
-
   grunt.initConfig({
 
     watch: {
       js: {
         files: ['./app/js/**/*.js'],
         tasks: ['haml', 'ngtemplates', 'concat:app', 'babel', 'browserify',
-            'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
+          'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
         options: {
           spawn: false,
         },
@@ -15,7 +14,7 @@ module.exports = function(grunt) {
       haml: {
         files: ['./app/templates/**/*.haml'],
         tasks: ['newer:haml', 'haml', 'ngtemplates', 'concat:app', 'babel', 'browserify',
-            'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
+          'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
         options: {
           spawn: false,
         },
@@ -33,8 +32,8 @@ module.exports = function(grunt) {
     sass: {
       dist: {
         options: {
-         style: 'expanded'
-       },
+          style: 'expanded'
+        },
         files: {
           'dist/app.css': './app/style/index.scss'
         }
@@ -96,17 +95,17 @@ module.exports = function(grunt) {
       }
     },
 
-   babel: {
-        options: {
-            sourceMap: true,
-            presets: ['es2016'],
-            "sourceType": "module",
-        },
-        dist: {
-            files: {
-                'dist/app.js': 'dist/app.js'
-            }
+    babel: {
+      options: {
+        sourceMap: true,
+        presets: ['es2016'],
+        "sourceType": "module",
+      },
+      dist: {
+        files: {
+          'dist/app.js': 'dist/app.js'
         }
+      }
     },
 
     browserify: {
@@ -117,8 +116,8 @@ module.exports = function(grunt) {
       }
     }
     ,
-   ngAnnotate: {
-     options: {
+    ngAnnotate: {
+      options: {
         singleQuotes: true,
       },
 
@@ -134,7 +133,7 @@ module.exports = function(grunt) {
         src: ['dist/compiled.js'],
         dest: 'dist/compiled.min.js'
       }
-   }
+    }
 
   });
 
