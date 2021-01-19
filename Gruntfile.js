@@ -59,7 +59,7 @@ module.exports = function(grunt) {
         separator: ';',
       },
       app: {
-        src: ['node_modules/sn-components-api/dist/dist.js', 'app/js/**/*.js'],
+        src: ['node_modules/@standardnotes/component-relay/dist/dist.js', 'app/js/**/*.js'],
         dest: 'dist/app.js',
       },
 
