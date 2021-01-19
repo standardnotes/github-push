@@ -1,6 +1,10 @@
 {
   "name": "sn-github-push",
   "version": "1.2.2",
+  "description": "Push note changes to a GitHub repository.",
+  "author": "Standard Notes <hello@standardnotes.org>",
+  "license": "AGPL-3.0",
+  "repository": "https://github.com/sn-extensions/github-push.git",
   "devDependencies": {
     "@standardnotes/component-relay": "2.0.2",
     "angular": "^1.8.2",
