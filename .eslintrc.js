@@ -11,5 +11,8 @@ module.exports = {
   "rules": {
     "indent": [2, 2],
     "no-var": "error"
+  },
+  "globals": {
+    "angular": true
   }
 };
