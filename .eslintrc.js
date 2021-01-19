@@ -12,5 +12,10 @@ module.exports = {
     "indent": [2, 2],
     "no-var": "error",
     "keyword-spacing": "error"
+  },
+  "globals": {
+    "angular": true,
+    "ComponentRelay": true,
+    "GitHub": true
   }
 };
