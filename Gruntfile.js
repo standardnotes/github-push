@@ -57,16 +57,20 @@ module.exports = function(grunt) {
       options: {
         separator: ';',
       },
+
       app: {
-        src: ['node_modules/@standardnotes/component-relay/dist/dist.js', 'app/js/**/*.js'],
+        src: ['app/js/**/*.js'],
         dest: 'dist/app.js',
       },
 
       lib: {
-        src: [
-          'node_modules/angular/angular.js',
-        ],
+        src: ['node_modules/angular/angular.js'],
         dest: 'dist/lib.js',
+      },
+
+      "component-relay": {
+        src: ['node_modules/@standardnotes/component-relay/dist/dist.js'],
+        dest: 'dist/component-relay.js'
       },
 
       css: {
@@ -83,8 +87,7 @@ module.exports = function(grunt) {
       },
     },
 
-
-    ngtemplates:  {
+    ngtemplates: {
       templates: {
         cwd: 'app/templates/generated/app/templates',
         src: ['**/*.html'],
@@ -99,7 +102,7 @@ module.exports = function(grunt) {
       options: {
         sourceMap: true,
         presets: ['es2016'],
-        "sourceType": "module",
+        sourceType: "module",
       },
       dist: {
         files: {
@@ -114,8 +117,8 @@ module.exports = function(grunt) {
           'dist/app.js': 'dist/app.js'
         }
       }
-    }
-    ,
+    },
+
     ngAnnotate: {
       options: {
         singleQuotes: true,
@@ -150,7 +153,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
 
   grunt.registerTask('default', [
-    'haml', 'sass', 'ngtemplates', 'concat:app', 'babel', 'browserify',
+    'haml', 'sass', 'ngtemplates', 'concat:component-relay', 'concat:app', 'babel', 'browserify',
     'concat:lib', 'concat:css', 'concat:dist', 'ngAnnotate', 'uglify'
   ]);
 };
