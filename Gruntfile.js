@@ -4,8 +4,8 @@ module.exports = function(grunt) {
     watch: {
       js: {
         files: ['./app/js/**/*.js'],
-        tasks: ['haml', 'ngtemplates', 'concat:app', 'babel', 'browserify',
-          'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
+        tasks: ['haml', 'ngtemplates', 'concat:component-relay', 'concat:app', 'babel', 'browserify',
+          'concat:lib', 'concat:dist', 'uglify'],
         options: {
           spawn: false,
         },
@@ -13,8 +13,8 @@ module.exports = function(grunt) {
 
       haml: {
         files: ['./app/templates/**/*.haml'],
-        tasks: ['newer:haml', 'haml', 'ngtemplates', 'concat:app', 'babel', 'browserify',
-          'concat:lib', 'concat:dist', 'ngAnnotate', 'uglify'],
+        tasks: ['newer:haml', 'haml', 'ngtemplates', 'concat:component-relay', 'concat:app', 'babel', 'browserify',
+          'concat:lib', 'concat:dist', 'uglify'],
         options: {
           spawn: false,
         },
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
     babel: {
       options: {
         sourceMap: true,
-        presets: ['es2016'],
+        presets: ['@babel/preset-env'],
         sourceType: "module",
       },
       dist: {
@@ -116,18 +116,6 @@ module.exports = function(grunt) {
         files: {
           'dist/app.js': 'dist/app.js'
         }
-      }
-    },
-
-    ngAnnotate: {
-      options: {
-        singleQuotes: true,
-      },
-
-      app: {
-        files: {
-          'dist/compiled.js': 'dist/compiled.js'
-        },
       }
     },
 
@@ -146,7 +134,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-haml2html');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-browserify');
@@ -154,6 +141,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'haml', 'sass', 'ngtemplates', 'concat:component-relay', 'concat:app', 'babel', 'browserify',
-    'concat:lib', 'concat:css', 'concat:dist', 'ngAnnotate', 'uglify'
+    'concat:lib', 'concat:css', 'concat:dist', 'uglify'
   ]);
 };
