@@ -5,6 +5,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 angular.module('app', []);
 ;
+
 var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   _classCallCheck(this, HomeCtrl);
 
@@ -12,7 +13,6 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     loading: true,
     pushStatus: "Push Changes"
   };
-
   var componentRelay = new ComponentRelay({
     targetWindow: window,
     onReady: function onReady() {
@@ -20,12 +20,11 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
       $scope.onReady();
     }
   });
-
   var defaultHeight = 60;
-
   componentRelay.streamContextItem(function (item) {
     $timeout(function () {
       $scope.note = item;
+
       if ($scope.repos) {
         $scope.loadRepoDataForCurrentNote();
       }
@@ -34,6 +33,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
   $scope.onReady = function () {
     $scope.token = componentRelay.getComponentDataValueForKey("token");
+
     if ($scope.token) {
       $scope.onTokenSet();
     }
@@ -49,18 +49,19 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.gh = new GitHub({
       token: $scope.token
     });
-
     var me = $scope.gh.getUser();
     $scope.formData.loadingRepos = true;
-
     me.listRepos(function (err, repos) {
       $timeout(function () {
         $scope.formData.loadingRepos = false;
+
         if (err) {
           alert("An error occurred with the GitHub Push extension. Make sure your GitHub token is valid and try again.");
           return;
         }
+
         $scope.repos = repos;
+
         if ($scope.note) {
           $scope.loadRepoDataForCurrentNote();
         }
@@ -80,6 +81,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     } else {
       // default pref
       var defaultRepo = componentRelay.getComponentDataValueForKey("defaultRepo");
+
       if (defaultRepo) {
         $scope.selectRepoWithName(defaultRepo);
       }
@@ -87,7 +89,6 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
     $scope.defaultFileExtension = componentRelay.getComponentDataValueForKey("defaultFileExtension");
     $scope.formData.fileExtension = $scope.noteFileExtension || $scope.defaultFileExtension || "txt";
-
     $scope.defaultFileDirectory = componentRelay.getComponentDataValueForKey("defaultFileDirectory");
     $scope.formData.fileDirectory = $scope.noteFileDirectory || $scope.defaultFileDirectory || "";
   };
@@ -101,12 +102,10 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
   $scope.didSelectRepo = function () {
     var repo = $scope.formData.selectedRepo;
-    $scope.selectedRepoObject = $scope.gh.getRepo(repo.owner.login, repo.name);
+    $scope.selectedRepoObject = $scope.gh.getRepo(repo.owner.login, repo.name); // save this as default repo for this note
 
-    // save this as default repo for this note
-    $scope.setDataForNote("repoName", repo.name);
+    $scope.setDataForNote("repoName", repo.name); // save this as default repo globally
 
-    // save this as default repo globally
     if (!$scope.hasDefaultRepo) {
       componentRelay.setComponentDataValueForKey("defaultRepo", repo.name);
       $scope.hasDefaultRepo = true;
@@ -120,9 +119,11 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
      * Skip updating the component data if the current value and the new value for the key are the same.
      * This will prevent spamming the postMessage API with the same message, which causes high CPU usage.
      */
+
     if (noteData[key] === value) {
       return;
     }
+
     noteData[key] = value;
     notesData[$scope.note.uuid] = noteData;
     componentRelay.setComponentDataValueForKey("notes", notesData);
@@ -132,27 +133,22 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     // if no directory is given, then push to root.
     if (!$directory) {
       return '';
-    }
-
-    // try to ensure they haven't attempted any funny business with escape strings by turning
+    } // try to ensure they haven't attempted any funny business with escape strings by turning
     // any backslashes into forward slashes - then replace any duplicate slashes with a single
     // slash.
-    return $directory = $directory
-    // make sure the last symbol is a '/'
-    .replace(/[/]*$/g, '/')
-    // make sure there are no escaping slashes.
-    .replace(/\\/g, '/')
-    // make sure there are no double '//'.
-    .replace(/\/\//g, '/')
-    // make sure the directory does not start with
+
+
+    return $directory = $directory // make sure the last symbol is a '/'
+    .replace(/[/]*$/g, '/') // make sure there are no escaping slashes.
+    .replace(/\\/g, '/') // make sure there are no double '//'.
+    .replace(/\/\//g, '/') // make sure the directory does not start with
     // a '/'.
     .replace(/^\/+/g, '');
   };
 
   $scope.pushChanges = function ($event) {
     $event.target.blur();
-    var message = $scope.formData.commitMessage || 'Updated note \'' + $scope.note.content.title + '\'';
-
+    var message = $scope.formData.commitMessage || "Updated note '".concat($scope.note.content.title, "'");
     var fileExtension = $scope.formData.fileExtension;
     var fileDirectory = $scope.formData.fileDirectory;
 
@@ -181,9 +177,10 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     }
 
     var fileName = $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension;
-
     $scope.formData.pushStatus = "Pushing...";
-    $scope.selectedRepoObject.writeFile("master", fileName, message, { encode: true }, function (err) {
+    $scope.selectedRepoObject.writeFile("master", fileName, message, {
+      encode: true
+    }, function (err) {
       $timeout(function () {
         if (!err) {
           $scope.formData.commitMessage = "";
@@ -213,11 +210,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   componentRelay.setSize("100%", defaultHeight);
 };
 
+HomeCtrl.$inject = ["$rootScope", "$scope", "$timeout"];
 // required for FireFox
-
-
 HomeCtrl.$$ngIsClass = true;
-
 angular.module('app').controller('HomeCtrl', HomeCtrl);
 
 
