@@ -203,7 +203,7 @@ class HomeCtrl {
       $scope.token = null;
     }
 
-    componentRelay.setSize("container", "100%", defaultHeight);
+    componentRelay.setSize("100%", defaultHeight);
   }
 }
 
