@@ -1,10 +1,11 @@
 class HomeCtrl {
   constructor($rootScope, $scope, $timeout) {
-
     $scope.formData = {
       loading: true,
-      pushStatus: "Push Changes"
+      pushStatus: "Push changes"
     };
+
+    $scope.tokenInputType = 'password';
 
     let componentRelay = new ComponentRelay({
       targetWindow: window,
@@ -53,9 +54,22 @@ class HomeCtrl {
             alert("An error occurred with the GitHub Push extension. Make sure your GitHub token is valid and try again.")
             return;
           }
-          $scope.repos = repos;
-          if ($scope.note) {
-            $scope.loadRepoDataForCurrentNote();
+          if (repos.length > 0) {
+            // Sorting repos by the full_name key, alphabetically
+            $scope.repos = repos.sort((a, b) => {
+              const aFullName = a.full_name.toLowerCase();
+              const bFullName = b.full_name.toLowerCase();
+
+              if (aFullName < bFullName) {
+                return -1;
+              } else if (aFullName > bFullName) {
+                return 1;
+              }
+              return 0;
+            });
+            if ($scope.note) {
+              $scope.loadRepoDataForCurrentNote();
+            }
           }
         });
       });
@@ -174,15 +188,15 @@ class HomeCtrl {
       }
 
       const fileName = $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension;
-
+      const defaultBranch = $scope.formData.selectedRepo.default_branch || "master";
       $scope.formData.pushStatus = "Pushing...";
-      $scope.selectedRepoObject.writeFile("master", fileName, message, {encode: true}, function(err) {
+      $scope.selectedRepoObject.writeFile(defaultBranch, fileName, message, {encode: true}, function(err) {
         $timeout(function(){
           if (!err) {
             $scope.formData.commitMessage = "";
             $scope.formData.pushStatus = "Success!";
             $timeout(function() {
-              $scope.formData.pushStatus = "Push Changes";
+              $scope.formData.pushStatus = "Push changes";
             }, 1500);
           } else {
             alert("Something went wrong trying to push your changes.", + err);
@@ -204,6 +218,11 @@ class HomeCtrl {
       $scope.formData = {
         loading: false
       };
+    }
+
+    $scope.toggleTokenVisibility = function () {
+      const currentInputType = $scope.tokenInputType;
+      $scope.tokenInputType = currentInputType === 'text' ? 'password' : 'text';
     }
 
     componentRelay.setSize("100%", defaultHeight);

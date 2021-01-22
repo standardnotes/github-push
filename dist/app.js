@@ -11,8 +11,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
   $scope.formData = {
     loading: true,
-    pushStatus: "Push Changes"
+    pushStatus: "Push changes"
   };
+  $scope.tokenInputType = 'password';
   var componentRelay = new ComponentRelay({
     targetWindow: window,
     onReady: function onReady() {
@@ -60,10 +61,24 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
           return;
         }
 
-        $scope.repos = repos;
+        if (repos.length > 0) {
+          // Sorting repos by the full_name key, alphabetically
+          $scope.repos = repos.sort(function (a, b) {
+            var aFullName = a.full_name.toLowerCase();
+            var bFullName = b.full_name.toLowerCase();
 
-        if ($scope.note) {
-          $scope.loadRepoDataForCurrentNote();
+            if (aFullName < bFullName) {
+              return -1;
+            } else if (aFullName > bFullName) {
+              return 1;
+            }
+
+            return 0;
+          });
+
+          if ($scope.note) {
+            $scope.loadRepoDataForCurrentNote();
+          }
         }
       });
     });
@@ -177,8 +192,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     }
 
     var fileName = $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension;
+    var defaultBranch = $scope.formData.selectedRepo.default_branch || "master";
     $scope.formData.pushStatus = "Pushing...";
-    $scope.selectedRepoObject.writeFile("master", fileName, message, {
+    $scope.selectedRepoObject.writeFile(defaultBranch, fileName, message, {
       encode: true
     }, function (err) {
       $timeout(function () {
@@ -186,7 +202,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
           $scope.formData.commitMessage = "";
           $scope.formData.pushStatus = "Success!";
           $timeout(function () {
-            $scope.formData.pushStatus = "Push Changes";
+            $scope.formData.pushStatus = "Push changes";
           }, 1500);
         } else {
           alert("Something went wrong trying to push your changes.", +err);
@@ -208,6 +224,11 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.formData = {
       loading: false
     };
+  };
+
+  $scope.toggleTokenVisibility = function () {
+    var currentInputType = $scope.tokenInputType;
+    $scope.tokenInputType = currentInputType === 'text' ? 'password' : 'text';
   };
 
   componentRelay.setSize("100%", defaultHeight);

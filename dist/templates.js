@@ -48,31 +48,50 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "</div>\n" +
     "</div>\n" +
     "<div class='vertical-rule'></div>\n" +
-    "<div class='sk-panel-column'>\n" +
-    "<div class='token-form' ng-if='!token'>\n" +
-    "<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token'>\n" +
+    "<div class='sk-panel-column' ng-if='!token'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='token-form'>\n" +
+    "<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>\n" +
+    "<div class='sk-button no-border' ng-click='toggleTokenVisibility()'>\n" +
+    "{{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}\n" +
     "</div>\n" +
     "</div>\n" +
-    "<div class='sk-panel-column' id='generate-token-column' ng-if='!token'>\n" +
-    "<a class='sk-a sk-button no-border info' href='https://github.com/settings/tokens/new' target='_blank'>\n" +
-    "<div class='sk-label'>Generate Token</div>\n" +
-    "</a>\n" +
+    "</div>\n" +
     "</div>\n" +
     "<div class='sk-panel-column' ng-if='token'>\n" +
-    "<div class='title'>{{formData.loadingRepos ? 'Loading Repositories' : 'Repository'}}</div>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>{{formData.loadingRepos ? 'Loading repositories...' : 'Repository:'}}</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-row'>\n" +
     "<select class='sk-input' ng-change='didSelectRepo()' ng-if='!formData.loadingRepos' ng-model='formData.selectedRepo'>\n" +
     "<option ng-repeat='repo in repos' ng-selected='repo == formData.selectedRepo' ng-value='repo'>\n" +
-    "{{repo.name}}\n" +
+    "{{repo.full_name}}\n" +
     "</option>\n" +
     "</select>\n" +
     "</div>\n" +
+    "</div>\n" +
     "<div class='vertical-rule'></div>\n" +
-    "<div id='commit-info' ng-if='formData.selectedRepo'>\n" +
-    "<input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Dir'>\n" +
+    "<div class='sk-panel-column' ng-if='!token'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "Paste your GitHub token and then press Enter key.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "If you need to generate a token, click\n" +
+    "<a href='https://github.com/settings/tokens/new' target='_blank'>here.</a>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-column' id='commit-info' ng-if='formData.selectedRepo'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Directory'>\n" +
     "<input class='sk-input contrast file-ext' ng-model='formData.fileExtension' placeholder='Ext'>\n" +
-    "<input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Msg'>\n" +
-    "<div class='sk-button info no-border' ng-click='pushChanges($event)' style='margin-left: 15px;'>\n" +
+    "<input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message'>\n" +
+    "<div class='sk-button info no-border' ng-click='pushChanges($event)'>\n" +
     "<div class='sk-label'>{{formData.pushStatus}}</div>\n" +
+    "</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "<div class='vertical-rule' ng-if='formData.selectedRepo'></div>\n" +
