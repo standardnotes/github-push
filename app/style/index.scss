@@ -85,17 +85,20 @@ a.sk-button {
 
   input {
     margin: 0;
-  }
-
-  input {
-    margin-right: 2px;
+    margin-right: 3px;
+    height: 35px;
   }
 
   .file-path, .commit-message {
-    width: 75px;
+    width: 200px;
   }
+
   .file-ext {
-    width: 40px;
+    width: 45px;
+  }
+
+  .sk-button {
+    margin-left: 10px;
   }
 }
 

@@ -18,10 +18,12 @@
                   {{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}
 
           .sk-panel-column{"ng-if" => "token"}
-            .title {{formData.loadingRepos ? 'Loading Repositories' : 'Repository'}}
-            %select.sk-input{"ng-if" => "!formData.loadingRepos", "ng-model" => "formData.selectedRepo", "ng-change" => "didSelectRepo()"}
-              %option{"ng-repeat" => "repo in repos", "ng-selected" => "repo == formData.selectedRepo", "ng-value" => "repo"}
-                {{repo.name}}
+            .sk-panel-row
+              .title {{formData.loadingRepos ? 'Loading repositories...' : 'Repository:'}}
+            .sk-panel-row
+              %select.sk-input{"ng-if" => "!formData.loadingRepos", "ng-model" => "formData.selectedRepo", "ng-change" => "didSelectRepo()"}
+                %option{"ng-repeat" => "repo in repos", "ng-selected" => "repo == formData.selectedRepo", "ng-value" => "repo"}
+                  {{repo.full_name}}
 
           .vertical-rule
 
@@ -34,12 +36,13 @@
                 If you need to generate a token, click
                 %a{"href" => "https://github.com/settings/tokens/new", "target" => "_blank"} here.
 
-          #commit-info{"ng-if" => "formData.selectedRepo"}
-            %input.sk-input.contrast.file-path{"placeholder" => "Dir", "ng-model" => "formData.fileDirectory"}
-            %input.sk-input.contrast.file-ext{"placeholder" => "Ext", "ng-model" => "formData.fileExtension"}
-            %input.sk-input.contrast.commit-message{"placeholder" => "Msg", "ng-model" => "formData.commitMessage", "ng-keyup" => "$event.keyCode == 13 && pushChanges($event);"}
-            .sk-button.info.no-border{"ng-click" => "pushChanges($event)", "style" => "margin-left: 15px;"}
-              .sk-label {{formData.pushStatus}}
+          .sk-panel-column#commit-info{"ng-if" => "formData.selectedRepo"}
+            .sk-panel-row
+              %input.sk-input.contrast.file-path{"placeholder" => "Directory", "ng-model" => "formData.fileDirectory"}
+              %input.sk-input.contrast.file-ext{"placeholder" => "Ext", "ng-model" => "formData.fileExtension"}
+              %input.sk-input.contrast.commit-message{"placeholder" => "Commit message", "ng-model" => "formData.commitMessage", "ng-keyup" => "$event.keyCode == 13 && pushChanges($event);"}
+              .sk-button.info.no-border{"ng-click" => "pushChanges($event)"}
+                .sk-label {{formData.pushStatus}}
 
           .vertical-rule{"ng-if" => "formData.selectedRepo"}
 
