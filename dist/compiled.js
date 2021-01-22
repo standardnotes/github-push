@@ -36794,7 +36794,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     });
   };
 
-  $scope.logout = function () {
+  $scope.signOut = function () {
     componentRelay.clearComponentData();
     $scope.hasDefaultRepo = null;
     $scope.defaultFileExtension = null;
@@ -36804,6 +36804,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.selectedRepo = null;
     $scope.repos = null;
     $scope.token = null;
+    $scope.formData = {
+      loading: false
+    };
   };
 
   componentRelay.setSize("100%", defaultHeight);
@@ -36895,8 +36898,8 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
     "</div>\n" +
     "<div class='vertical-rule' ng-if='formData.selectedRepo'></div>\n" +
     "<div class='sk-panel-column' ng-if='token'>\n" +
-    "<div class='sk-button danger no-border' ng-click='logout()'>\n" +
-    "<div class='sk-label'>Logout</div>\n" +
+    "<div class='sk-button danger no-border' ng-click='signOut()'>\n" +
+    "<div class='sk-label'>Sign out</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

@@ -77,8 +77,8 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "</div>\n" +
     "<div class='vertical-rule' ng-if='formData.selectedRepo'></div>\n" +
     "<div class='sk-panel-column' ng-if='token'>\n" +
-    "<div class='sk-button danger no-border' ng-click='logout()'>\n" +
-    "<div class='sk-label'>Logout</div>\n" +
+    "<div class='sk-button danger no-border' ng-click='signOut()'>\n" +
+    "<div class='sk-label'>Sign out</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
