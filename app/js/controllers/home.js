@@ -205,7 +205,7 @@ class HomeCtrl {
       });
     }
 
-    $scope.logout = function() {
+    $scope.signOut = function() {
       componentRelay.clearComponentData();
       $scope.hasDefaultRepo = null;
       $scope.defaultFileExtension = null;
@@ -215,6 +215,9 @@ class HomeCtrl {
       $scope.selectedRepo = null;
       $scope.repos = null;
       $scope.token = null;
+      $scope.formData = {
+        loading: false
+      };
     }
 
     $scope.toggleTokenVisibility = function () {

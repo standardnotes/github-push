@@ -211,7 +211,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     });
   };
 
-  $scope.logout = function () {
+  $scope.signOut = function () {
     componentRelay.clearComponentData();
     $scope.hasDefaultRepo = null;
     $scope.defaultFileExtension = null;
@@ -221,6 +221,9 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.selectedRepo = null;
     $scope.repos = null;
     $scope.token = null;
+    $scope.formData = {
+      loading: false
+    };
   };
 
   $scope.toggleTokenVisibility = function () {
