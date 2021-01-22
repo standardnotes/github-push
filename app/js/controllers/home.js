@@ -201,6 +201,9 @@ class HomeCtrl {
       $scope.selectedRepo = null;
       $scope.repos = null;
       $scope.token = null;
+      $scope.formData = {
+        loading: false
+      };
     }
 
     componentRelay.setSize("100%", defaultHeight);
