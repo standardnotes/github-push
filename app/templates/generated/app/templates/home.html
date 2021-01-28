@@ -12,7 +12,7 @@
 <div class='sk-panel-column' ng-if='!token'>
 <div class='sk-panel-row'>
 <div class='token-form'>
-<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>
+<input autocomplete='off' class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>
 <div class='sk-button no-border' ng-click='toggleTokenVisibility()'>
 {{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}
 </div>
@@ -35,13 +35,14 @@
 <div class='sk-panel-column' ng-if='!token'>
 <div class='sk-panel-row'>
 <div class='title'>
-Paste your GitHub token and then press Enter key.
+Click
+<a href='https://github.com/settings/tokens/new' target='_blank'>here</a>
+to generate a new token.
 </div>
 </div>
 <div class='sk-panel-row'>
 <div class='title'>
-If you need to generate a token, click
-<a href='https://github.com/settings/tokens/new' target='_blank'>here.</a>
+Paste your personal access token and press Enter/Return.
 </div>
 </div>
 </div>
@@ -50,8 +51,8 @@ If you need to generate a token, click
 <input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Directory'>
 <input class='sk-input contrast file-ext' ng-model='formData.fileExtension' placeholder='Ext'>
 <input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message'>
-<div class='sk-button info no-border' ng-click='pushChanges($event)'>
-<div class='sk-label'>{{formData.pushStatus}}</div>
+<div class='sk-button no-border' ng-class='pushBtnClass' ng-click='pushChanges($event)'>
+<div class='sk-label'>{{pushStatus}}</div>
 </div>
 </div>
 </div>

@@ -13,7 +13,7 @@
           .sk-panel-column{"ng-if" => "!token"}
             .sk-panel-row
               .token-form
-                %input.sk-input.contrast{"type" => "{{tokenInputType}}", "ng-model" => "formData.token", "placeholder" => "Enter GitHub token", "ng-keyup" => "$event.keyCode == 13 && submitToken();"}
+                %input.sk-input.contrast{"type" => "{{tokenInputType}}", "ng-model" => "formData.token", "placeholder" => "Enter GitHub token", "ng-keyup" => "$event.keyCode == 13 && submitToken();", "autocomplete" => "off"}
                 .sk-button.no-border{"ng-click" => "toggleTokenVisibility()"}
                   {{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}
 
@@ -30,19 +30,20 @@
           .sk-panel-column{"ng-if" => "!token"}
             .sk-panel-row
               .title
-                Paste your GitHub token and then press Enter key.
+                Click
+                %a{"href" => "https://github.com/settings/tokens/new", "target" => "_blank"} here
+                to generate a new token.
             .sk-panel-row
               .title
-                If you need to generate a token, click
-                %a{"href" => "https://github.com/settings/tokens/new", "target" => "_blank"} here.
+                Paste your personal access token and press Enter/Return.
 
           .sk-panel-column#commit-info{"ng-if" => "formData.selectedRepo"}
             .sk-panel-row
               %input.sk-input.contrast.file-path{"placeholder" => "Directory", "ng-model" => "formData.fileDirectory"}
               %input.sk-input.contrast.file-ext{"placeholder" => "Ext", "ng-model" => "formData.fileExtension"}
               %input.sk-input.contrast.commit-message{"placeholder" => "Commit message", "ng-model" => "formData.commitMessage", "ng-keyup" => "$event.keyCode == 13 && pushChanges($event);"}
-              .sk-button.info.no-border{"ng-click" => "pushChanges($event)"}
-                .sk-label {{formData.pushStatus}}
+              .sk-button.no-border{"ng-click" => "pushChanges($event)", "ng-class" => "pushBtnClass"}
+                .sk-label {{pushStatus}}
 
           .vertical-rule{"ng-if" => "formData.selectedRepo"}
 
