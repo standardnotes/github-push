@@ -6,6 +6,7 @@
   "license": "AGPL-3.0",
   "author": "Standard Notes <hello@standardnotes.org>",
   "scripts": {
+    "start": "grunt watch",
     "build": "grunt",
     "lint": "eslint app --ext .js",
     "lint:fix": "npm run lint --fix"
