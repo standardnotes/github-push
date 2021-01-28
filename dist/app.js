@@ -10,9 +10,10 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   _classCallCheck(this, HomeCtrl);
 
   $scope.formData = {
-    loading: true,
-    pushStatus: "Push changes"
+    loading: true
   };
+  $scope.pushBtnClass = "info";
+  $scope.pushStatus = "Push changes";
   $scope.tokenInputType = 'password';
   var componentRelay = new ComponentRelay({
     targetWindow: window,
@@ -58,6 +59,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
         if (err) {
           alert("An error occurred with the GitHub Push extension. Make sure your GitHub token is valid and try again.");
+          $scope.signOut();
           return;
         }
 
@@ -163,7 +165,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
   $scope.pushChanges = function ($event) {
     $event.target.blur();
-    var message = $scope.formData.commitMessage || "Updated note '".concat($scope.note.content.title, "'");
+    var commitMessage = $scope.formData.commitMessage || "Updated note '".concat($scope.note.content.title, "'");
     var fileExtension = $scope.formData.fileExtension;
     var fileDirectory = $scope.formData.fileDirectory;
 
@@ -192,23 +194,32 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     }
 
     var fileName = $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension;
-    var defaultBranch = $scope.formData.selectedRepo.default_branch || "master";
-    $scope.formData.pushStatus = "Pushing...";
-    $scope.selectedRepoObject.writeFile(defaultBranch, fileName, message, {
+    var defaultBranch = $scope.formData.selectedRepo.default_branch || "main";
+    var fileContent = $scope.note.content.text;
+    $timeout(function () {
+      $scope.pushStatus = "Pushing...";
+      $scope.pushBtnClass = "warning";
+    });
+    $scope.selectedRepoObject.writeFile(defaultBranch, fileName, fileContent, commitMessage, {
       encode: true
     }, function (err) {
       $timeout(function () {
+        $scope.formData.commitMessage = "";
+
         if (!err) {
-          $scope.formData.commitMessage = "";
-          $scope.formData.pushStatus = "Success!";
-          $timeout(function () {
-            $scope.formData.pushStatus = "Push changes";
-          }, 1500);
+          $scope.pushStatus = "Success!";
+          $scope.pushBtnClass = "success";
         } else {
-          alert("Something went wrong trying to push your changes.", +err);
+          $scope.pushStatus = "Error!";
+          $scope.pushBtnClass = "danger";
+          alert("Something went wrong trying to push your changes.");
         }
       });
     });
+    $timeout(function () {
+      $scope.pushStatus = "Push changes";
+      $scope.pushBtnClass = "info";
+    }, 2000);
   };
 
   $scope.signOut = function () {
