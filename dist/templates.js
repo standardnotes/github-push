@@ -39,6 +39,28 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   $templateCache.put('home.html',
     "<div class='sn-component'>\n" +
     "<div class='sk-panel static full-height'>\n" +
+    "<div class='sk-panel-content full-height' id='panel-content' ng-if='formData.loading'>\n" +
+    "<div class='sk-panel-row full-height justify-left'>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div id='title-container'>\n" +
+    "<div id='title'>GitHub Push</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='vertical-rule'></div>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "The extension failed to load.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "Please reload Standard Notes and try again.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
     "<div class='sk-panel-content full-height' id='panel-content' ng-if='!formData.loading'>\n" +
     "<div class='sk-panel-section no-bottom-pad full-height'>\n" +
     "<div class='sk-panel-row full-height justify-left'>\n" +
