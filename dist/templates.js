@@ -73,10 +73,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "<div class='sk-panel-column' ng-if='!token'>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='token-form'>\n" +
-    "<input autocomplete='off' class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>\n" +
-    "<div class='sk-button no-border' ng-click='toggleTokenVisibility()'>\n" +
-    "{{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}\n" +
-    "</div>\n" +
+    "<input autocomplete='off' class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='text'>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

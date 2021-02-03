@@ -14,7 +14,6 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   };
   $scope.pushBtnClass = "info";
   $scope.pushStatus = "Push changes";
-  $scope.tokenInputType = 'password';
   var componentRelay = new ComponentRelay({
     targetWindow: window,
     onReady: function onReady() {
@@ -235,11 +234,6 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.formData = {
       loading: false
     };
-  };
-
-  $scope.toggleTokenVisibility = function () {
-    var currentInputType = $scope.tokenInputType;
-    $scope.tokenInputType = currentInputType === 'text' ? 'password' : 'text';
   };
 
   componentRelay.setSize("100%", defaultHeight);
