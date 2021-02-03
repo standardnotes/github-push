@@ -6,7 +6,6 @@ class HomeCtrl {
 
     $scope.pushBtnClass = "info";
     $scope.pushStatus = "Push changes";
-    $scope.tokenInputType = 'password';
 
     let componentRelay = new ComponentRelay({
       targetWindow: window,
@@ -231,11 +230,6 @@ class HomeCtrl {
       $scope.formData = {
         loading: false
       };
-    }
-
-    $scope.toggleTokenVisibility = function () {
-      const currentInputType = $scope.tokenInputType;
-      $scope.tokenInputType = currentInputType === 'text' ? 'password' : 'text';
     }
 
     componentRelay.setSize("100%", defaultHeight);

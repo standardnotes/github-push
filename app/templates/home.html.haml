@@ -26,9 +26,7 @@
           .sk-panel-column{"ng-if" => "!token"}
             .sk-panel-row
               .token-form
-                %input.sk-input.contrast{"type" => "{{tokenInputType}}", "ng-model" => "formData.token", "placeholder" => "Enter GitHub token", "ng-keyup" => "$event.keyCode == 13 && submitToken();", "autocomplete" => "off"}
-                .sk-button.no-border{"ng-click" => "toggleTokenVisibility()"}
-                  {{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}
+                %input.sk-input.contrast{"type" => "text", "ng-model" => "formData.token", "placeholder" => "Enter GitHub token", "ng-keyup" => "$event.keyCode == 13 && submitToken();", "autocomplete" => "off"}
 
           .sk-panel-column{"ng-if" => "token"}
             .sk-panel-row
