@@ -36609,10 +36609,10 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
   _classCallCheck(this, HomeCtrl);
 
   $scope.formData = {
-    loading: true,
-    pushStatus: "Push changes"
+    loading: true
   };
-  $scope.tokenInputType = 'password';
+  $scope.pushBtnClass = "info";
+  $scope.pushStatus = "Push changes";
   var componentRelay = new ComponentRelay({
     targetWindow: window,
     onReady: function onReady() {
@@ -36657,6 +36657,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
         if (err) {
           alert("An error occurred with the GitHub Push extension. Make sure your GitHub token is valid and try again.");
+          $scope.signOut();
           return;
         }
 
@@ -36762,7 +36763,7 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
 
   $scope.pushChanges = function ($event) {
     $event.target.blur();
-    var message = $scope.formData.commitMessage || "Updated note '".concat($scope.note.content.title, "'");
+    var commitMessage = $scope.formData.commitMessage || "Updated note '".concat($scope.note.content.title, "'");
     var fileExtension = $scope.formData.fileExtension;
     var fileDirectory = $scope.formData.fileDirectory;
 
@@ -36791,23 +36792,32 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     }
 
     var fileName = $scope.sanitizeFileDirectory(fileDirectory) + $scope.note.content.title + "." + fileExtension;
-    var defaultBranch = $scope.formData.selectedRepo.default_branch || "master";
-    $scope.formData.pushStatus = "Pushing...";
-    $scope.selectedRepoObject.writeFile(defaultBranch, fileName, message, {
+    var defaultBranch = $scope.formData.selectedRepo.default_branch || "main";
+    var fileContent = $scope.note.content.text;
+    $timeout(function () {
+      $scope.pushStatus = "Pushing...";
+      $scope.pushBtnClass = "warning";
+    });
+    $scope.selectedRepoObject.writeFile(defaultBranch, fileName, fileContent, commitMessage, {
       encode: true
     }, function (err) {
       $timeout(function () {
+        $scope.formData.commitMessage = "";
+
         if (!err) {
-          $scope.formData.commitMessage = "";
-          $scope.formData.pushStatus = "Success!";
-          $timeout(function () {
-            $scope.formData.pushStatus = "Push changes";
-          }, 1500);
+          $scope.pushStatus = "Success!";
+          $scope.pushBtnClass = "success";
         } else {
-          alert("Something went wrong trying to push your changes.", +err);
+          $scope.pushStatus = "Error!";
+          $scope.pushBtnClass = "danger";
+          alert("Something went wrong trying to push your changes.");
         }
       });
     });
+    $timeout(function () {
+      $scope.pushStatus = "Push changes";
+      $scope.pushBtnClass = "info";
+    }, 2000);
   };
 
   $scope.signOut = function () {
@@ -36823,11 +36833,6 @@ var HomeCtrl = function HomeCtrl($rootScope, $scope, $timeout) {
     $scope.formData = {
       loading: false
     };
-  };
-
-  $scope.toggleTokenVisibility = function () {
-    var currentInputType = $scope.tokenInputType;
-    $scope.tokenInputType = currentInputType === 'text' ? 'password' : 'text';
   };
 
   componentRelay.setSize("100%", defaultHeight);
@@ -36881,6 +36886,28 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
   $templateCache.put('home.html',
     "<div class='sn-component'>\n" +
     "<div class='sk-panel static full-height'>\n" +
+    "<div class='sk-panel-content full-height' id='panel-content' ng-if='formData.loading'>\n" +
+    "<div class='sk-panel-row full-height justify-left'>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div id='title-container'>\n" +
+    "<div id='title'>GitHub Push</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='vertical-rule'></div>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "The extension failed to load.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "Please reload Standard Notes and try again.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
     "<div class='sk-panel-content full-height' id='panel-content' ng-if='!formData.loading'>\n" +
     "<div class='sk-panel-section no-bottom-pad full-height'>\n" +
     "<div class='sk-panel-row full-height justify-left'>\n" +
@@ -36893,10 +36920,7 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
     "<div class='sk-panel-column' ng-if='!token'>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='token-form'>\n" +
-    "<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>\n" +
-    "<div class='sk-button no-border' ng-click='toggleTokenVisibility()'>\n" +
-    "{{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}\n" +
-    "</div>\n" +
+    "<input autocomplete='off' class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='text'>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -36916,13 +36940,14 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
     "<div class='sk-panel-column' ng-if='!token'>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='title'>\n" +
-    "Paste your GitHub token and then press Enter key.\n" +
+    "Click\n" +
+    "<a href='https://github.com/settings/tokens/new' target='_blank'>here</a>\n" +
+    "to generate a new token.\n" +
     "</div>\n" +
     "</div>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='title'>\n" +
-    "If you need to generate a token, click\n" +
-    "<a href='https://github.com/settings/tokens/new' target='_blank'>here.</a>\n" +
+    "Paste your personal access token and press Enter/Return.\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -36931,8 +36956,8 @@ angular.module('app').controller('HomeCtrl', HomeCtrl);
     "<input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Directory'>\n" +
     "<input class='sk-input contrast file-ext' ng-model='formData.fileExtension' placeholder='Ext'>\n" +
     "<input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message'>\n" +
-    "<div class='sk-button info no-border' ng-click='pushChanges($event)'>\n" +
-    "<div class='sk-label'>{{formData.pushStatus}}</div>\n" +
+    "<div class='sk-button no-border' ng-class='pushBtnClass' ng-click='pushChanges($event)'>\n" +
+    "<div class='sk-label'>{{pushStatus}}</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

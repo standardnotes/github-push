@@ -39,6 +39,28 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   $templateCache.put('home.html',
     "<div class='sn-component'>\n" +
     "<div class='sk-panel static full-height'>\n" +
+    "<div class='sk-panel-content full-height' id='panel-content' ng-if='formData.loading'>\n" +
+    "<div class='sk-panel-row full-height justify-left'>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div id='title-container'>\n" +
+    "<div id='title'>GitHub Push</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='vertical-rule'></div>\n" +
+    "<div class='sk-panel-column'>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "The extension failed to load.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "<div class='sk-panel-row'>\n" +
+    "<div class='title'>\n" +
+    "Please reload Standard Notes and try again.\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
+    "</div>\n" +
     "<div class='sk-panel-content full-height' id='panel-content' ng-if='!formData.loading'>\n" +
     "<div class='sk-panel-section no-bottom-pad full-height'>\n" +
     "<div class='sk-panel-row full-height justify-left'>\n" +
@@ -51,10 +73,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "<div class='sk-panel-column' ng-if='!token'>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='token-form'>\n" +
-    "<input class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='{{tokenInputType}}'>\n" +
-    "<div class='sk-button no-border' ng-click='toggleTokenVisibility()'>\n" +
-    "{{tokenInputType === 'text' ? 'HIDE' : 'SHOW'}}\n" +
-    "</div>\n" +
+    "<input autocomplete='off' class='sk-input contrast' ng-keyup='$event.keyCode == 13 &amp;&amp; submitToken();' ng-model='formData.token' placeholder='Enter GitHub token' type='text'>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -74,13 +93,14 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "<div class='sk-panel-column' ng-if='!token'>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='title'>\n" +
-    "Paste your GitHub token and then press Enter key.\n" +
+    "Click\n" +
+    "<a href='https://github.com/settings/tokens/new' target='_blank'>here</a>\n" +
+    "to generate a new token.\n" +
     "</div>\n" +
     "</div>\n" +
     "<div class='sk-panel-row'>\n" +
     "<div class='title'>\n" +
-    "If you need to generate a token, click\n" +
-    "<a href='https://github.com/settings/tokens/new' target='_blank'>here.</a>\n" +
+    "Paste your personal access token and press Enter/Return.\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +
@@ -89,8 +109,8 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "<input class='sk-input contrast file-path' ng-model='formData.fileDirectory' placeholder='Directory'>\n" +
     "<input class='sk-input contrast file-ext' ng-model='formData.fileExtension' placeholder='Ext'>\n" +
     "<input class='sk-input contrast commit-message' ng-keyup='$event.keyCode == 13 &amp;&amp; pushChanges($event);' ng-model='formData.commitMessage' placeholder='Commit message'>\n" +
-    "<div class='sk-button info no-border' ng-click='pushChanges($event)'>\n" +
-    "<div class='sk-label'>{{formData.pushStatus}}</div>\n" +
+    "<div class='sk-button no-border' ng-class='pushBtnClass' ng-click='pushChanges($event)'>\n" +
+    "<div class='sk-label'>{{pushStatus}}</div>\n" +
     "</div>\n" +
     "</div>\n" +
     "</div>\n" +

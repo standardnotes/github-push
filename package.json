@@ -1,11 +1,12 @@
 {
   "name": "sn-github-push",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Push note changes to a GitHub repository.",
   "repository": "https://github.com/sn-extensions/github-push.git",
   "license": "AGPL-3.0",
   "author": "Standard Notes <hello@standardnotes.org>",
   "scripts": {
+    "start": "grunt watch",
     "build": "grunt",
     "lint": "eslint app --ext .js",
     "lint:fix": "npm run lint --fix"
